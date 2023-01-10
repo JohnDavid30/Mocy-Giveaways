@@ -248,7 +248,7 @@ class GiveawaySystem extends EventEmitter {
   async start(channelId, options) {
     return new Promise(async (resolve, reject) => {
       // code
-      const { channel, duration, prize, winnerCount } = options;
+      const { channel, duration, prize, winnerCount, hostedBy } = options;
       if (!channel?.id || !channel.isTextBased()) {
                 return reject(`channel is not a valid text based channel. (val=${channel})`);
             }
@@ -280,14 +280,14 @@ class GiveawaySystem extends EventEmitter {
       let giveawaydata = {
         messageId: message.id,
         channelId: channel.id,
-        guildId: interaction.guild.id,
+        guildId: channel.guildId,
         prize: prize,
         started: timeStart,
         entry: [],
         entered: 0,
         winCount: winnerCount,
         endTime: endTime,
-        hostedBy: interaction.member.id,
+        hostedBy: options.hostedBy ? options.hostedBy.toString() : undefined,,
         ended: false,
         winners: [],
       };
