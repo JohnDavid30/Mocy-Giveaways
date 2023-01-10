@@ -15,8 +15,8 @@ const mongoose = require("mongoose");
 
 const joinBtn = new ButtonBuilder()
   .setCustomId("join_btn")
-  .setStyle(ButtonStyle.Danger)
-  .setLabel("Join Giveaways")
+  .setStyle(ButtonStyle.Secondary)
+  .setLabel("Enter")
 
 class GiveawaySystem extends EventEmitter {
   /**
@@ -245,18 +245,10 @@ class GiveawaySystem extends EventEmitter {
    * @param {import("./types").GiveawayStartOptions} options
    * @returns
    */
-  async start(channelId, options) {
+  async start(interaction, options) {
     return new Promise(async (resolve, reject) => {
       // code
-      const { channel, duration, prize, winnerCount, hostedBy } = options;
-      if (!channel?.id || !channel.isTextBased()) {
-                return reject(`channel is not a valid text based channel. (val=${channel})`);
-            }
-            if (channel.isThread() && !channel.sendable) {
-                return reject(
-                    `The manager is unable to send messages in the provided ThreadChannel. (id=${channel.id})`
-                );
-            }
+      const { channel, duration, prize, winnerCount } = options;
       const timeStart = Date.now();
       const btnRow = new ActionRowBuilder().addComponents([joinBtn]);
       const time = ms(duration);
@@ -267,7 +259,7 @@ class GiveawaySystem extends EventEmitter {
       let GiveawayEmbed = this.GiveawayStartEmbed({
         prize: prize,
         endTime: endsAt,
-        hostedBy: options.hostedBy ? options.hostedBy.toString() : undefined,
+        hostedBy: interaction.member.id,
         winCount: winnerCount,
         started: timeStart,
       });
@@ -280,14 +272,14 @@ class GiveawaySystem extends EventEmitter {
       let giveawaydata = {
         messageId: message.id,
         channelId: channel.id,
-        guildId: channel.guildId,
+        guildId: interaction.guild.id,
         prize: prize,
         started: timeStart,
         entry: [],
         entered: 0,
         winCount: winnerCount,
         endTime: endTime,
-        hostedBy: options.hostedBy ? options.hostedBy.toString() : undefined,
+        hostedBy: interaction.member.id,
         ended: false,
         winners: [],
       };
