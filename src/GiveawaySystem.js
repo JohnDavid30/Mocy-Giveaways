@@ -245,10 +245,18 @@ class GiveawaySystem extends EventEmitter {
    * @param {import("./types").GiveawayStartOptions} options
    * @returns
    */
-  async start(interaction, options) {
+  async start(channel, options) {
     return new Promise(async (resolve, reject) => {
       // code
       const { channel, duration, prize, winnerCount } = options;
+      if (!channel?.id || !channel.isTextBased()) {
+                return reject(`channel is not a valid text based channel. (val=${channel})`);
+            }
+            if (channel.isThread() && !channel.sendable) {
+                return reject(
+                    `The manager is unable to send messages in the provided ThreadChannel. (id=${channel.id})`
+                );
+            }
       const timeStart = Date.now();
       const btnRow = new ActionRowBuilder().addComponents([joinBtn]);
       const time = ms(duration);
