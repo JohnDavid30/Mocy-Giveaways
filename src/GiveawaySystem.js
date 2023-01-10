@@ -267,7 +267,7 @@ class GiveawaySystem extends EventEmitter {
       let GiveawayEmbed = this.GiveawayStartEmbed({
         prize: prize,
         endTime: endsAt,
-        hostedBy: interaction.member.id,
+        hostedBy: options.hostedBy ? options.hostedBy.toString() : undefined,
         winCount: winnerCount,
         started: timeStart,
       });
