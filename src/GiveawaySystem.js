@@ -245,7 +245,7 @@ class GiveawaySystem extends EventEmitter {
    * @param {import("./types").GiveawayStartOptions} options
    * @returns
    */
-  async start(channel, options) {
+  async start(channelId, options) {
     return new Promise(async (resolve, reject) => {
       // code
       const { channel, duration, prize, winnerCount } = options;
