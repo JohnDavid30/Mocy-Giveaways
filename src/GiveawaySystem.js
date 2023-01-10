@@ -287,7 +287,7 @@ class GiveawaySystem extends EventEmitter {
         entered: 0,
         winCount: winnerCount,
         endTime: endTime,
-        hostedBy: options.hostedBy ? options.hostedBy.toString() : undefined,,
+        hostedBy: options.hostedBy ? options.hostedBy.toString() : undefined,
         ended: false,
         winners: [],
       };
