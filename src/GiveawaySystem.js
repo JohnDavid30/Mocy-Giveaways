@@ -26,6 +26,7 @@ class GiveawaySystem extends EventEmitter {
     this.giveaways = [];
     this.giveaway = null;
     this.pingEveryone = options.pingEveryone;
+    this.description = options.description;
     this.emoji = options.emoji;
     this.client.on("ready", async () => {
       await this.getGiveaways().then(() => {
@@ -239,7 +240,7 @@ class GiveawaySystem extends EventEmitter {
         .setCustomId("join_btn")
         .setStyle(ButtonStyle.Success)
         .setEmoji(this.emoji)
-        .setLabel("Join");
+        .setLabel(this.description);
 
       const btnRow = new ActionRowBuilder().addComponents([joinBtn]);
 
