@@ -8,19 +8,20 @@ const { Client } = require("discord.js");
  * @returns
  */
 async function fetchGCM(client, giveaways, messageId) {
+  // code
   let giveaway = giveaways.find((g) => g.messageId === messageId);
   if (!giveaway) return;
   let guild = client.guilds.cache.get(giveaway.guildId);
   if (!guild) {
     await client.guilds.fetch(giveaway.guildId).catch((e) => {});
   }
-  let channel = guild?.channels.cache.get(giveaway.channelId);
+  let channel = guild.channels.cache.get(giveaway.channelId);
   if (!channel) {
     await guild.channels.fetch(giveaway.channelId).catch((e) => {});
   }
-  let message = channel?.messages.cache.get(giveaway?.messageId);
+  let message = channel.messages.cache.get(giveaway.messageId);
   if (!message) {
-    await channel?.messages.fetch(giveaway?.messageId).catch((e) => {});
+    await channel.messages.fetch(giveaway.messageId).catch((e) => {});
   }
   let obj = {};
   if (message && channel && guild) {
@@ -35,10 +36,10 @@ async function fetchGCM(client, giveaways, messageId) {
   return obj;
 }
 
-async function editEmbed(message, data, embed) {
-  let channel = message.guild.channels.cache.get(data.channelId);
+async function editEmbed(message, giveawaydata, embed) {
+  let channel = message.guild.channels.cache.get(giveawaydata.channelId);
   if (!channel) return;
-  let msg = await channel.messages.fetch(data.messageId);
+  let msg = await channel.messages.fetch(giveawaydata.messageId);
   msg
     .edit({
       embeds: [embed],
