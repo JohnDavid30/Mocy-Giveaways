@@ -167,7 +167,7 @@ class GiveawaySystem extends EventEmitter {
                 embeds: [
                   EmbedBuilder.from(embeds).setFooter({
                     text: `${entry} Users Joined`,
-                    // iconURL: interaction.guild.iconURL(),
+                     iconURL: this.client.user.displayAvatarURL(),
                   }),
                 ],
               });
