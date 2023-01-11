@@ -30,7 +30,7 @@ class GiveawaySystem extends EventEmitter {
     this.client.on("ready", async () => {
       await this.getGiveaways().then(() => {
         this.handleGiveaway().then(() => {
-          this.emit("GiveawayReady", `Real Giveaways`);
+          this.emit("GiveawayReady", `Mocy Giveaways`);
         });
       });
     });
