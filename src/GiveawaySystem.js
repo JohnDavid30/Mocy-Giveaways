@@ -294,7 +294,7 @@ class GiveawaySystem extends EventEmitter {
       .addFields([
         {
           name: `Ends In`,
-          value: `> <t:${giveaway.endTime}:R>`,
+          value: `> <t:${Math.floor(giveaway.endTime / 1000)}:R>`,
           inline: true,
         },
         {
