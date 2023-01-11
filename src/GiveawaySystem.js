@@ -13,11 +13,6 @@ const { fetchGCM, editEmbed, createGiveaway } = require("./utils/functions");
 const Giveaway = require("./Giveaway");
 const mongoose = require("mongoose");
 
-const joinBtn = new ButtonBuilder()
-  .setCustomId("join_btn")
-  .setStyle(ButtonStyle.Secondary)
-  .setLabel("Join Giveaway")
-
 class GiveawaySystem extends EventEmitter {
   /**
    *
@@ -31,15 +26,15 @@ class GiveawaySystem extends EventEmitter {
     this.giveaways = [];
     this.giveaway = null;
     this.pingEveryone = options.pingEveryone;
+    this.emoji = options.emoji;
     this.client.on("ready", async () => {
       await this.getGiveaways().then(() => {
         this.handleGiveaway().then(() => {
-          this.emit("GiveawayReady", `Mocy Giveaways`);
+          this.emit("GiveawayReady", `Real Giveaways`);
         });
       });
     });
     this.client.on("interactionCreate", async (interaction) => {
-      if (!interaction.inGuild()) return;
       await this.handleInteraction(interaction);
     });
   }
@@ -70,7 +65,7 @@ class GiveawaySystem extends EventEmitter {
           const { message } = await fetchGCM(
             this.client,
             this.giveaways,
-            data?.messageId
+            data.messageId
           );
           if (!message) return;
           this.giveaway = new Giveaway(this, {
@@ -156,14 +151,8 @@ class GiveawaySystem extends EventEmitter {
     // code
     if (interaction.isButton()) {
       await interaction?.deferUpdate().catch((e) => {});
-      await interaction?.deferReply().catch((e) => {});
       const { member } = interaction;
-      if (member.user.bot) {
-        return interaction.followUp({
-          content: `Bots are not allowed to join Giveaway`,
-          ephemeral: true,
-        });
-      }
+      if (member.user.bot) return;
       switch (interaction.customId) {
         case "join_btn":
           {
@@ -172,20 +161,14 @@ class GiveawaySystem extends EventEmitter {
             });
             if (!data) return;
             function updateentry(entry) {
-              const Enter = new ButtonBuilder()
-  .setCustomId("enter")
-  .setStyle(ButtonStyle.Secondary)
-  .setLabel(`Entered Users: ${entry}`)
               let embeds = interaction.message.embeds[0];
               interaction.message.edit({
                 embeds: [
                   EmbedBuilder.from(embeds).setFooter({
-                    text: `${entry} Users Joined`,}),
-                    ],
-                    components: [new ActionRowBuilder().addComponents([joinBtn, Enter.setDisabled(true)])],
+                    text: `${entry} Users Joined`,
                     // iconURL: interaction.guild.iconURL(),
-                  //}),
-                //],
+                  }),
+                ],
               });
             }
             let gData = createGiveaway(data);
@@ -250,18 +233,23 @@ class GiveawaySystem extends EventEmitter {
       // code
       const { channel, duration, prize, winnerCount } = options;
       const timeStart = Date.now();
-      const btnRow = new ActionRowBuilder().addComponents([joinBtn]);
-      const time = ms(duration);
-      const endTime = Number(Date.now() + time);
-      const endsAt = Number((Date.now() + time).toString().slice(0, -3));
+      const endTime = Date.now() + ms(duration);
 
-      // code embed
+      const joinBtn = new ButtonBuilder()
+        .setCustomId("join_btn")
+        .setStyle(ButtonStyle.Success)
+        .setEmoji(this.emoji)
+        .setLabel("Join");
+
+      const btnRow = new ActionRowBuilder().addComponents([joinBtn]);
+
       let GiveawayEmbed = this.GiveawayStartEmbed({
         prize: prize,
-        endTime: endsAt,
+        endTime: endTime,
         hostedBy: interaction.member.id,
         winCount: winnerCount,
         started: timeStart,
+        entered: 0,
       });
       let sendOptions = {
         content: `${this.pingEveryone ? "@everyone" : " "} `,
@@ -384,30 +372,31 @@ class GiveawaySystem extends EventEmitter {
       ]);
     return GiveawayEmbed;
   }
-
+  /**
+   * return deleted number count like 1 , 19 , 23
+   * @param {String} guildID
+   * @returns
+   */
   async deleteall(guildID) {
-    // let data = await GModel.deleteMany({ guildId: guildID });
     let giveawaydata = await GModel.find({ guildId: guildID });
-    let deleted = 0;
-    await giveawaydata.forEach(async (data) => {
+    for (const data of giveawaydata) {
       const { message } = await fetchGCM(
         this.client,
         this.giveaways,
         data.messageId
       );
       if (message?.id) await message.delete().catch((e) => {});
-      deleted++;
       await data.delete();
-    });
+    }
     await this.getGiveaways();
-    return deleted;
+    return { deleted: giveawaydata.length };
   }
 
   async getGiveaways() {
     const data = await GModel.find();
     let giveaways = data.map((data) => createGiveaway(data));
     this.giveaways = giveaways;
-    return data;
+    return this.giveaways;
   }
 
   async deleteGiveaway(messageId) {
