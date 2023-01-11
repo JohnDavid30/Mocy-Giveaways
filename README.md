@@ -61,11 +61,15 @@ const client = new Discord.Client({
 // const manager = new CustomManager(client, {
 //   embedColor: "Random",
 //   pingEveryone: true,
+//   emoji: "🎉",
+//   description: "Enter",
 // });
 
 const manager = new GiveawaySystem(client, {
   embedColor: "Random",
   pingEveryone: true,
+  emoji: "🎉", //emoji button
+  description: "Enter", //name button
 });
 // We now have a giveawaysManager property to access the manager everywhere!
 client.giveawaysManager = manager;
